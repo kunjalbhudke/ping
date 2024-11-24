@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .output {
+            margin-top: 20px;
+            text-align: left;
+            white-space: pre-wrap;
+            font-family: monospace;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            color: #333;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ping Tool</h1>
+        <input type="text" id="target" placeholder="Enter IP/Hostname" />
+        <button onclick="performPing()">Ping</button>
+        <div class="output" id="output"></div>
+    </div>
+
+    <script>
+        async function performPing() {
+            const target = document.getElementById("target").value;
+            const outputDiv = document.getElementById("output");
+
+            outputDiv.innerHTML = ""; // Clear previous results
+
+            if (!target) {
+                outputDiv.innerHTML = "<span class='error'>Please enter an IP or hostname.</span>";
+                return;
+            }
+
+            try {
+                const response = await fetch("/ping", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: `target=${target}`,
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    outputDiv.innerHTML = result.output;
+                } else {
+                    outputDiv.innerHTML = `<span class='error'>${result.error || "Ping failed"}</span>`;
+                }
+            } catch (error) {
+                outputDiv.innerHTML = `<span class='error'>An error occurred: ${error.message}</span>`;
+            }
+        }
+    </script>
+</body>
+</html>
